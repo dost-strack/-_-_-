@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Игра Memory</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 { margin-bottom: 10px; }
+
+    #moves {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    #game {
+        width: 420px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(4, 100px);
+        grid-gap: 10px;
+    }
+
+    .card {
+        width: 100px;
+        height: 100px;
+        background: #008cff;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 40px;
+        border-radius: 10px;
+        cursor: pointer;
+        user-select: none;
+        transition: background .3s;
+    }
+
+    .revealed {
+        background: #333;
+    }
+
+    .matched {
+        background: #00cc66 !important;
+    }
+
+    #restart {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 18px;
+        background: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<h1>🧠 Игра На Память</h1>
+
+<div id="moves">Ходы: 0</div>
+<div id="game"></div>
+
+<button id="restart">Играть снова</button>
+
+<script>
+let symbols = ["🍎","🍌","🍒","🍓","🍇","🍉","🍑","🥝"];
+let cards, opened, moves;
+
+let game = document.getElementById("game");
+let movesText = document.getElementById("moves");
+let restartBtn = document.getElementById("restart");
+
+function startGame() {
+    game.innerHTML = "";
+    restartBtn.style.display = "none";
+
+    cards = [...symbols, ...symbols];
+    cards.sort(() => Math.random() - 0.5);
+
+    opened = [];
+    moves = 0;
+    movesText.innerHTML = "Ходы: 0";
+
+    cards.forEach((sym, i) => {
+        let div = document.createElement("div");
+        div.className = "card";
+        div.dataset.index = i;
+        div.dataset.value = sym;
+        div.innerHTML = "?";
+        game.appendChild(div);
+    });
+}
+
+startGame();
+
+game.addEventListener("click", function(e) {
+    let card = e.target;
+    if (!card.classList.contains("card")) return;
+    if (card.classList.contains("revealed") || card.classList.contains("matched")) return;
+    if (opened.length === 2) return;
+
+    reveal(card);
+    opened.push(card);
+
+    if (opened.length === 2) {
+        moves++;
+        movesText.innerHTML = "Ходы: " + moves;
+        setTimeout(checkMatch, 700);
+    }
+});
+
+function reveal(card) {
+    card.classList.add("revealed");
+    card.innerHTML = card.dataset.value;
+}
+
+function hide(card) {
+    card.classList.remove("revealed");
+    card.innerHTML = "?";
+}
+
+function checkMatch() {
+    let [c1, c2] = opened;
+
+    if (c1.dataset.value === c2.dataset.value) {
+        c1.classList.add("matched");
+        c2.classList.add("matched");
+    } else {
+        hide(c1);
+        hide(c2);
+    }
+
+    opened = [];
+
+    if (document.querySelectorAll(".matched").length === cards.length) {
+        setTimeout(() => {
+            alert("Победа! Ходы: " + moves);
+            restartBtn.style.display = "inline-block";
+        }, 300);
+    }
+}
+
+restartBtn.addEventListener("click", startGame);
+</script>
+
+</body>
+</html>
