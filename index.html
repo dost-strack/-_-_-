@@ -8,12 +8,38 @@
     body {
         font-family: Arial, sans-serif;
         text-align: center;
-        background: #f5f5f5;
         margin: 0;
         padding: 20px;
+        background: #f5f5f5;
+        color: #000;
+        transition: 0.3s;
     }
 
-    h1 { margin-bottom: 10px; }
+    body.dark {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    h1 { margin-bottom: 5px; }
+
+    #settings {
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 8px;
+        background: #008cff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        transform: scale(1.05);
+    }
 
     #moves {
         font-size: 20px;
@@ -43,8 +69,12 @@
         transition: background .3s;
     }
 
+    body.dark .card {
+        background: #444;
+    }
+
     .revealed {
-        background: #333;
+        background: #333 !important;
     }
 
     .matched {
@@ -52,21 +82,23 @@
     }
 
     #restart {
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 18px;
-        background: #ff9800;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
         display: none;
+        background: #ff9800;
     }
 </style>
 </head>
 <body>
 
-<h1>🧠 Игра На Память</h1>
+<h1>🧠 Игра Memory</h1>
+
+<div id="settings">
+    <button id="themeBtn">🌙 Тёмная тема</button>
+    <button id="musicBtn">🔊 Музыка: Вкл</button>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a2d8df09e.mp3?filename=happy-ambient-111059.mp3">
+</audio>
 
 <div id="moves">Ходы: 0</div>
 <div id="game"></div>
@@ -81,6 +113,39 @@ let game = document.getElementById("game");
 let movesText = document.getElementById("moves");
 let restartBtn = document.getElementById("restart");
 
+let themeBtn = document.getElementById("themeBtn");
+let musicBtn = document.getElementById("musicBtn");
+let bgMusic = document.getElementById("bgMusic");
+
+// ==== Тема ====
+themeBtn.onclick = () => {
+    document.body.classList.toggle("dark");
+
+    if (document.body.classList.contains("dark")) {
+        themeBtn.textContent = "☀️ Светлая тема";
+    } else {
+        themeBtn.textContent = "🌙 Тёмная тема";
+    }
+};
+
+// ==== Музыка ====
+let musicOn = true;
+bgMusic.volume = 0.3;
+bgMusic.play().catch(()=>{}); 
+
+musicBtn.onclick = () => {
+    musicOn = !musicOn;
+
+    if (musicOn) {
+        bgMusic.play();
+        musicBtn.textContent = "🔊 Музыка: Вкл";
+    } else {
+        bgMusic.pause();
+        musicBtn.textContent = "🔇 Музыка: Выкл";
+    }
+};
+
+// ==== Игра ====
 function startGame() {
     game.innerHTML = "";
     restartBtn.style.display = "none";
